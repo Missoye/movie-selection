@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Catalog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .genres-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .genres-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .genre-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .genre-btn {
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .genre-btn:hover {
+            background: #e0e0e0;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .genre-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .movies-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .movies-header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .movies-header h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .movies-header p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .movie-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .movie-number {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        .movie-title {
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .placeholder {
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 60px 20px;
+            text-align: center;
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .genres-section {
+                position: static;
+            }
+
+            .genre-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            header h1 {
+                font-size: 2.5em;
+            }
+
+            .movies-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .movie-card input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-right: 10px;
+            accent-color: #667eea;
+        }
+
+        .movie-card.selected {
+            background: #e8eef9;
+            border-color: #667eea;
+        }
+
+        .movie-card.selected .movie-title {
+            color: #667eea;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #666;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .favorites-counter {
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .clear-favorites-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .clear-favorites-btn:hover {
+            background: #ff5252;
+        }
+
+        .empty-favorites {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .movie-list-item {
+            display: flex;
+            align-items: center;
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            justify-content: space-between;
+        }
+
+        .movie-list-item-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .movie-list-item-title {
+            font-weight: 500;
+            color: #333;
+            flex: 1;
+        }
+
+        .movie-list-item-genre {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .remove-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #ff5252;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: #764ba2;
+        }
+
+        .export-btn.secondary {
+            background: #764ba2;
+        }
+
+        .export-btn.secondary:hover {
+            background: #667eea;
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #51cf66;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Movie Catalog</h1>
+            <p>Browse your favorite movies by genre</p>
+        </header>
+
+        <div class="main-content">
+            <div class="genres-section">
+                <h2>📽️ Genres</h2>
+                <div class="genre-list" id="genreList"></div>
+            </div>
+
+            <div class="movies-section">
+                <div class="movies-header">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <h2 id="genreTitle">Select a Genre</h2>
+                            <p id="genreCount"></p>
+                        </div>
+                        <div class="favorites-counter" id="favCounter" style="display: none;">0</div>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('browse')">📽️ Browse</button>
+                    <button class="tab-btn" onclick="switchTab('favorites')">❤️ Favorites</button>
+                </div>
+
+                <div id="browseTab" class="tab-content active">
+                    <div class="movies-grid" id="moviesGrid">
+                        <div class="placeholder">👈 Select a genre to view movies</div>
+                    </div>
+                </div>
+
+                <div id="favoritesTab" class="tab-content">
+                    <div id="favoritesList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Movie Catalog | Browse and discover your next favorite film</p>
+        </div>
+    </div>
+
+    <script>
+        // Movie database
+        const movies = {
+            "Action": [
+                "The Matrix",
+                "Die Hard",
+                "Mission: Impossible",
+                "John Wick",
+                "Top Gun",
+                "Fast & Furious",
+                "Avengers: Endgame",
+                "Mad Max: Fury Road",
+                "Terminator 2",
+                "Speed"
+            ],
+            "Comedy": [
+                "The Grand Budapest Hotel",
+                "Superbad",
+                "Bridesmaids",
+                "Anchorman",
+                "The Hangover",
+                "Ghostbusters",
+                "Knives Out",
+                "Dumb and Dumber",
+                "Tropic Thunder",
+                "Step Brothers"
+            ],
+            "Drama": [
+                "The Shawshank Redemption",
+                "Forrest Gump",
+                "The Godfather",
+                "Schindler's List",
+                "Pulp Fiction",
+                "Moonlight",
+                "The Social Network",
+                "Parasite",
+                "Oppenheimer",
+                "A Gentleman's Agreement"
+            ],
+            "Horror": [
+                "The Ring",
+                "Hereditary",
+                "Get Out",
+                "A Quiet Place",
+                "The Exorcist",
+                "Halloween",
+                "Insidious",
+                "Sinister",
+                "It Follows",
+                "Conjuring"
+            ],
+            "Romance": [
+                "The Notebook",
+                "Titanic",
+                "La La Land",
+                "Pride and Prejudice",
+                "Eternal Sunshine of the Spotless Mind",
+                "Crazy, Stupid, Love",
+                "Before Sunrise",
+                "About Time",
+                "Notting Hill",
+                "The Fault in Our Stars"
+            ],
+            "Sci-Fi": [
+                "Inception",
+                "Interstellar",
+                "Blade Runner 2049",
+                "The Martian",
+                "Dune",
+                "Tenet",
+                "Ex Machina",
+                "The Fifth Element",
+                "Arrival",
+                "Gravity"
+            ],
+            "Thriller": [
+                "Psycho",
+                "Se7en",
+                "Zodiac",
+                "Gone Girl",
+                "Parasite",
+                "The Silence of the Lambs",
+                "No Country for Old Men",
+                "Shutter Island",
+                "Knives Out",
+                "Mystic River"
+            ],
+            "Animation": [
+                "Spirited Away",
+                "Coco",
+                "Frozen",
+                "Toy Story",
+                "The Lion King",
+                "Zootopia",
+                "Incredibles 2",
+                "Inside Out",
+                "Moana",
+                "Encanto"
+            ]
+        };
+
+        let favorites = JSON.parse(localStorage.getItem('movieFavorites')) || [];
+
+        // Initialize genre buttons
+        function initializeGenres() {
+            const genreList = document.getElementById('genreList');
+            Object.keys(movies).forEach(genre => {
+                const button = document.createElement('button');
+                button.className = 'genre-btn';
+                button.textContent = genre;
+                button.onclick = () => displayMovies(genre, button);
+                genreList.appendChild(button);
+            });
+            updateFavoritesCounter();
+        }
+
+        // Display movies for selected genre
+        function displayMovies(genre, button) {
+            // Update active button
+            document.querySelectorAll('.genre-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+
+            // Update header
+            const movieList = movies[genre];
+            document.getElementById('genreTitle').textContent = `${genre} Movies`;
+            document.getElementById('genreCount').textContent = `${movieList.length} films available`;
+
+            // Display movies
+            const moviesGrid = document.getElementById('moviesGrid');
+            moviesGrid.innerHTML = '';
+            
+            movieList.forEach((movie, index) => {
+                const movieId = `${genre}-${movie}`;
+                const isSelected = favorites.some(fav => fav.id === movieId);
+                
+                const card = document.createElement('div');
+                card.className = `movie-card ${isSelected ? 'selected' : ''}`;
+                card.innerHTML = `
+                    <div style="display: flex; align-items: flex-start; gap: 10px;">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleFavorite('${movieId}', '${genre}', '${movie}', this)">
+                        <div>
+                            <div class="movie-number">#${index + 1}</div>
+                            <div class="movie-title">${movie}</div>
+                        </div>
+                    </div>
+                `;
+                moviesGrid.appendChild(card);
+            });
+        }
+
+        // Toggle favorite
+        function toggleFavorite(movieId, genre, movie, checkbox) {
+            if (checkbox.checked) {
+                // Add to favorites
+                if (!favorites.some(fav => fav.id === movieId)) {
+                    favorites.push({ id: movieId, genre, movie });
+                    saveFavorites();
+                }
+                // Highlight card
+                checkbox.closest('.movie-card').classList.add('selected');
+            } else {
+                // Remove from favorites
+                favorites = favorites.filter(fav => fav.id !== movieId);
+                saveFavorites();
+                // Remove highlight
+                checkbox.closest('.movie-card').classList.remove('selected');
+            }
+            updateFavoritesCounter();
+            displayFavorites();
+        }
+
+        // Save favorites to localStorage
+        function saveFavorites() {
+            localStorage.setItem('movieFavorites', JSON.stringify(favorites));
+        }
+
+        // Update favorites counter
+        function updateFavoritesCounter() {
+            const counter = document.getElementById('favCounter');
+            if (favorites.length > 0) {
+                counter.textContent = favorites.length;
+                counter.style.display = 'flex';
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+
+        // Display favorites
+        function displayFavorites() {
+            const favoritesList = document.getElementById('favoritesList');
+            
+            if (favorites.length === 0) {
+                favoritesList.innerHTML = `
+                    <div class="empty-favorites">
+                        <p>❤️ No favorites yet!</p>
+                        <p>Select movies from the Browse tab to add them here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            favoritesList.innerHTML = '';
+            favorites.forEach((fav, index) => {
+                const item = document.createElement('div');
+                item.className = 'movie-list-item';
+                item.innerHTML = `
+                    <div class="movie-list-item-info">
+                        <span class="movie-list-item-genre">${fav.genre}</span>
+                        <span class="movie-list-item-title">${fav.movie}</span>
+                    </div>
+                    <button class="remove-btn" onclick="removeFavorite('${fav.id}')">Remove</button>
+                `;
+                favoritesList.appendChild(item);
+            });
+
+            // Add export buttons
+            const exportDiv = document.createElement('div');
+            exportDiv.className = 'export-buttons';
+            exportDiv.innerHTML = `
+                <button class="export-btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+                <button class="export-btn secondary" onclick="downloadAsJSON()">💾 Download JSON</button>
+                <button class="export-btn secondary" onclick="downloadAsText()">📄 Download Text</button>
+            `;
+            favoritesList.appendChild(exportDiv);
+        }
+
+        // Copy to clipboard
+        function copyToClipboard() {
+            let text = 'My Movie Favorites:\n\n';
+            favorites.forEach(fav => {
+                text += `• ${fav.movie} (${fav.genre})\n`;
+            });
+
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('✅ Copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy: ' + err);
+            });
+        }
+
+        // Download as JSON
+        function downloadAsJSON() {
+            const data = {
+                exportDate: new Date().toISOString(),
+                totalMovies: favorites.length,
+                movies: favorites
+            };
+            
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `movie-favorites-${new Date().getTime()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('✅ Downloaded as JSON!');
+        }
+
+        // Download as Text
+        function downloadAsText() {
+            let text = 'My Movie Favorites\n';
+            text += '=' + '='.repeat(50) + '\n';
+            text += `Downloaded: ${new Date().toLocaleString()}\n`;
+            text += `Total Movies: ${favorites.length}\n`;
+            text += '=' + '='.repeat(50) + '\n\n';
+
+            let currentGenre = '';
+            const grouped = {};
+            favorites.forEach(fav => {
+                if (!grouped[fav.genre]) grouped[fav.genre] = [];
+                grouped[fav.genre].push(fav.movie);
+            });
+
+            Object.keys(grouped).sort().forEach(genre => {
+                text += `\n${genre}:\n`;
+                text += '-' + '-'.repeat(50) + '\n';
+                grouped[genre].forEach(movie => {
+                    text += `  • ${movie}\n`;
+                });
+            });
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `movie-favorites-${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('✅ Downloaded as Text!');
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'copy-success';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+        }
+
+        // Remove single favorite
+        function removeFavorite(movieId) {
+            favorites = favorites.filter(fav => fav.id !== movieId);
+            saveFavorites();
+            updateFavoritesCounter();
+            displayFavorites();
+            
+            // Update current genre view if active
+            const activeBtn = document.querySelector('.genre-btn.active');
+            if (activeBtn) {
+                displayMovies(activeBtn.textContent, activeBtn);
+            }
+        }
+
+        // Clear all favorites
+        function clearAllFavorites() {
+            if (confirm('Are you sure you want to clear all favorites?')) {
+                favorites = [];
+                saveFavorites();
+                updateFavoritesCounter();
+                displayFavorites();
+                
+                // Update current genre view if active
+                const activeBtn = document.querySelector('.genre-btn.active');
+                if (activeBtn) {
+                    displayMovies(activeBtn.textContent, activeBtn);
+                }
+            }
+        }
+
+        // Switch between tabs
+        function switchTab(tab) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            if (tab === 'browse') {
+                document.getElementById('browseTab').classList.add('active');
+            } else {
+                document.getElementById('favoritesTab').classList.add('active');
+                displayFavorites();
+            }
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            initializeGenres();
+        };
+    </script>
+</body>
+</html>
